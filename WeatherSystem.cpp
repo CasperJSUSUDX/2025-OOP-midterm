@@ -10,9 +10,10 @@ void WeatherSystem::run(const std::string& filename) {
     // TODO: 1. Ask user for country code (e.g., "AT")
     std::string countryCode;
     std::cin >> countryCode;
+    std::transform(countryCode.begin(), countryCode.end(), countryCode.begin(), [](unsigned char c) {return std::toupper(c);});
     
     // TODO: 2. Load data using CSVReader::readCSV
-    CSVReader::readCSV(filename, countryCode);
+    std::vector<WeatherReading> data = CSVReader::readCSV(filename, countryCode);
     
     // TODO: 3. Implement a menu loop
     // Options should include:
@@ -21,11 +22,13 @@ void WeatherSystem::run(const std::string& filename) {
     // 3. Filter Data
     // 4. Predict Temperature
     // 5. Exit
-    WeatherReading one{"1980-01-01T00:00:00Z", -3.64};
-    WeatherReading two{"1980-01-02T00:00:00Z",-6.666};
-    WeatherReading three{"1980-01-03T00:00:00Z",-6.343};
-    std::vector<WeatherReading> testData = {one, two, three};
-    std::vector<Candlestick> candlesticks = computeCandlesticks(testData, Timeframe::Daily);
+
+    // WeatherReading one{"1980-01-01T00:00:00Z", -3.64};
+    // WeatherReading two{"1980-01-02T00:00:00Z",-6.666};
+    // WeatherReading three{"1980-01-03T00:00:00Z",-6.343};
+    // std::vector<WeatherReading> testData = {one, two, three};
+    std::vector<Candlestick> candlesticks = computeCandlesticks(data, Timeframe::Yearly);
+    // std::cout << "Date: " << candlesticks[0].date << "\nOpen: " << candlesticks[0].open << "\nClose: " << candlesticks[0].close << "\nHigh: " << candlesticks[0].high << "\nLow: " << candlesticks[0].low << "\n" << std::endl;
     for (const Candlestick& e: candlesticks)
     {
         std::cout << "Date: " << e.date << "\nOpen: " << e.open << "\nClose: " << e.close << "\nHigh: " << e.high << "\nLow: " << e.low << "\n" << std::endl;
@@ -72,6 +75,7 @@ std::vector<Candlestick> WeatherSystem::computeCandlesticks(const std::vector<We
         if (time != currentTime)
         {
             // Compute and create Candlestick object then add it to the vector
+            // std::cout << temperatures.size() << std::endl;
             std::max_element(temperatures.begin(), temperatures.end());
             double close;
             if (candlesticks.size() > 0)
