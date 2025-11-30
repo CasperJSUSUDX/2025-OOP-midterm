@@ -23,12 +23,7 @@ void WeatherSystem::run(const std::string& filename) {
     // 4. Predict Temperature
     // 5. Exit
 
-    // WeatherReading one{"1980-01-01T00:00:00Z", -3.64};
-    // WeatherReading two{"1980-01-02T00:00:00Z",-6.666};
-    // WeatherReading three{"1980-01-03T00:00:00Z",-6.343};
-    // std::vector<WeatherReading> testData = {one, two, three};
     std::vector<Candlestick> candlesticks = computeCandlesticks(data, Timeframe::Yearly);
-    // std::cout << "Date: " << candlesticks[0].date << "\nOpen: " << candlesticks[0].open << "\nClose: " << candlesticks[0].close << "\nHigh: " << candlesticks[0].high << "\nLow: " << candlesticks[0].low << "\n" << std::endl;
     for (const Candlestick& e: candlesticks)
     {
         std::cout << "Date: " << e.date << "\nOpen: " << e.open << "\nClose: " << e.close << "\nHigh: " << e.high << "\nLow: " << e.low << "\n" << std::endl;
