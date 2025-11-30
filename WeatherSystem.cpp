@@ -7,8 +7,11 @@
 
 void WeatherSystem::run(const std::string& filename) {
     // TODO: 1. Ask user for country code (e.g., "AT")
+    std::string countryCode;
+    std::cin >> countryCode;
     
     // TODO: 2. Load data using CSVReader::readCSV
+    CSVReader::readCSV(filename, countryCode);
     
     // TODO: 3. Implement a menu loop
     // Options should include:
@@ -28,6 +31,11 @@ std::vector<Candlestick> WeatherSystem::computeCandlesticks(const std::vector<We
     // Hint: You can use a std::map<std::string, std::vector<double>> to group temperatures by date key
     // - For Yearly: key = YYYY
     // - For Monthly: key = YYYY-MM
+    std::map<std::string, double> dataPair;
+    for (const WeatherReading& data: rawData)
+    {
+        dataPair.insert({data.timestamp, data.temp});
+    }
     
     // TODO: 2. For each group, compute the candlestick data:
     // - High: Max temperature in the group
