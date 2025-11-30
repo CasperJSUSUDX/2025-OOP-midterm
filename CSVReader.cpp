@@ -20,7 +20,7 @@ std::vector<WeatherReading> CSVReader::readCSV(const std::string& filename, cons
         std::vector<std::string> tokens = split(line, ',');
         for (int i = 0; i < tokens.size(); ++i)
         {
-            if (tokens[i].find(countryCode))
+            if (tokens[i].find(countryCode + "_temperature") != std::string::npos)
             {
                 index = i;
                 break;
