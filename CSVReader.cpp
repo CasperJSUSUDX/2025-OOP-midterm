@@ -36,7 +36,7 @@ std::vector<WeatherReading> CSVReader::readCSV(const std::string& filename, cons
         while (std::getline(csvFile, line))
         {
             tokens = split(line, ',');
-            std::cout << "Time: " << tokens[0] << "\nTemperature: " << tokens[index] << std::endl;
+            // std::cout << "Time: " << tokens[0] << "\nTemperature: " << tokens[index] << std::endl;
             WeatherReading weather{
                 tokens[0],
                 std::stod(tokens[index])

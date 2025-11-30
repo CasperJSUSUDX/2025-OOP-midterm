@@ -3,6 +3,7 @@
 #include <map>
 #include <algorithm>
 #include <cmath>
+#include <numeric>
 #include <iomanip>
 
 void WeatherSystem::run(const std::string& filename) {
@@ -20,6 +21,15 @@ void WeatherSystem::run(const std::string& filename) {
     // 3. Filter Data
     // 4. Predict Temperature
     // 5. Exit
+    WeatherReading one{"1980-01-01T00:00:00Z", -3.64};
+    WeatherReading two{"1980-01-02T00:00:00Z",-6.666};
+    WeatherReading three{"1980-01-03T00:00:00Z",-6.343};
+    std::vector<WeatherReading> testData = {one, two, three};
+    std::vector<Candlestick> candlesticks = computeCandlesticks(testData, Timeframe::Daily);
+    for (const Candlestick& e: candlesticks)
+    {
+        std::cout << "Date: " << e.date << "\nOpen: " << e.open << "\nClose: " << e.close << "\nHigh: " << e.high << "\nLow: " << e.low << "\n" << std::endl;
+    }
     
     // Based on the user's choice, call the appropriate helper functions
 }
@@ -31,10 +41,92 @@ std::vector<Candlestick> WeatherSystem::computeCandlesticks(const std::vector<We
     // Hint: You can use a std::map<std::string, std::vector<double>> to group temperatures by date key
     // - For Yearly: key = YYYY
     // - For Monthly: key = YYYY-MM
-    std::map<std::string, double> dataPair;
+    std::map<std::string, std::vector<double>> dataPair;
+    std::vector<double> temperatures;
+    std::string currentTime = "";
     for (const WeatherReading& data: rawData)
     {
-        dataPair.insert({data.timestamp, data.temp});
+        std::string time;
+        std::vector<std::string> dateKeys = CSVReader::split(CSVReader::split(data.timestamp, 'T')[0], '-');
+        std::string year = dateKeys[0];
+        std::string month = dateKeys[1];
+        std::string day = dateKeys[2];
+        switch (timeframe)
+        {
+            case Timeframe::Yearly:
+                time = year;
+                break;
+            
+            case Timeframe::Monthly:
+                time = year + "-" + month;
+                break;
+
+            case Timeframe::Daily:
+                time = year + "-" + month + "-" + day;
+                break;
+            
+            default:
+                time = year;
+                break;
+        }       
+
+        if (currentTime == "")
+        {
+            currentTime = time;
+        }
+        if (time != currentTime)
+        {
+            dataPair.insert(std::make_pair(time, temperatures));
+            std::max_element(temperatures.begin(), temperatures.end());
+            double close;
+            if (candlesticks.size() > 0)
+            {
+                close = candlesticks.back().close;
+            }
+            else
+            {
+                close = 0.0;
+            }
+            double min = *std::min_element(temperatures.begin(), temperatures.end());
+            double max = *std::max_element(temperatures.begin(), temperatures.end());
+            Candlestick candlestick{
+                year + "-" + month + "-" + day,
+                close,
+                std::accumulate(temperatures.begin(), temperatures.end(), 0.0) / temperatures.size(),
+                max,
+                min
+            };
+            candlesticks.push_back(candlestick);
+            currentTime = time;
+            temperatures.clear();
+        }
+    
+        temperatures.push_back(data.temp);
+
+        if (&rawData.back() == &data)
+        {
+            dataPair.insert(std::make_pair(time, temperatures));
+            std::max_element(temperatures.begin(), temperatures.end());
+            double close;
+            if (candlesticks.size() > 0)
+            {
+                close = candlesticks.back().open;
+            }
+            else
+            {
+                close = 0.0;
+            }
+            double min = *std::min_element(temperatures.begin(), temperatures.end());
+            double max = *std::max_element(temperatures.begin(), temperatures.end());
+            Candlestick candlestick{
+                year + "-" + month + "-" + day,
+                close,
+                std::accumulate(temperatures.begin(), temperatures.end(), 0.0) / temperatures.size(),
+                max,
+                min
+            };
+            candlesticks.push_back(candlestick);
+        }
     }
     
     // TODO: 2. For each group, compute the candlestick data:
