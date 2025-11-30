@@ -36,14 +36,9 @@ void WeatherSystem::run(const std::string& filename) {
 
 std::vector<Candlestick> WeatherSystem::computeCandlesticks(const std::vector<WeatherReading>& rawData, Timeframe timeframe) {
     std::vector<Candlestick> candlesticks;
-    
-    // TODO: 1. Group data based on the timeframe (Year, Month, or Day)
-    // Hint: You can use a std::map<std::string, std::vector<double>> to group temperatures by date key
-    // - For Yearly: key = YYYY
-    // - For Monthly: key = YYYY-MM
-    std::map<std::string, std::vector<double>> dataPair;
     std::vector<double> temperatures;
     std::string currentTime = "";
+
     for (const WeatherReading& data: rawData)
     {
         std::string time;
@@ -76,7 +71,7 @@ std::vector<Candlestick> WeatherSystem::computeCandlesticks(const std::vector<We
         }
         if (time != currentTime)
         {
-            dataPair.insert(std::make_pair(time, temperatures));
+            // Compute and create Candlestick object then add it to the vector
             std::max_element(temperatures.begin(), temperatures.end());
             double close;
             if (candlesticks.size() > 0)
@@ -105,7 +100,7 @@ std::vector<Candlestick> WeatherSystem::computeCandlesticks(const std::vector<We
 
         if (&rawData.back() == &data)
         {
-            dataPair.insert(std::make_pair(time, temperatures));
+            // Compute and create Candlestick object then add it to the vector
             std::max_element(temperatures.begin(), temperatures.end());
             double close;
             if (candlesticks.size() > 0)
@@ -116,26 +111,19 @@ std::vector<Candlestick> WeatherSystem::computeCandlesticks(const std::vector<We
             {
                 close = 0.0;
             }
+            double open = std::accumulate(temperatures.begin(), temperatures.end(), 0.0) / temperatures.size();
             double min = *std::min_element(temperatures.begin(), temperatures.end());
             double max = *std::max_element(temperatures.begin(), temperatures.end());
             Candlestick candlestick{
                 year + "-" + month + "-" + day,
                 close,
-                std::accumulate(temperatures.begin(), temperatures.end(), 0.0) / temperatures.size(),
+                open,
                 max,
                 min
             };
             candlesticks.push_back(candlestick);
         }
     }
-    
-    // TODO: 2. For each group, compute the candlestick data:
-    // - High: Max temperature in the group
-    // - Low: Min temperature in the group
-    // - Close: Average temperature of the group
-    // - Open: The 'Close' of the previous timeframe (or the first 'Close' for the very first item)
-    
-    // TODO: 3. Create Candlestick objects and add them to the vector
     
     return candlesticks;
 }
