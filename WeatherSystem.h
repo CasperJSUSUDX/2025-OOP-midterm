@@ -20,6 +20,7 @@ private:
     void plotCandlesticks(const std::vector<Candlestick>& candles, Timeframe timeframe);
     void predictTemperature(const std::vector<Candlestick>& candles);
     std::vector<Candlestick> filterData(const std::vector<Candlestick>& candles, const std::string& startDate, const std::string& endDate);
+    void printMenu();
 };
 
 

@@ -22,6 +22,7 @@ void WeatherSystem::run(const std::string& filename) {
     // 3. Filter Data
     // 4. Predict Temperature
     // 5. Exit
+    printMenu();
 
     std::vector<Candlestick> candlesticks = computeCandlesticks(data, Timeframe::Yearly);
     for (const Candlestick& e: candlesticks)
@@ -157,4 +158,14 @@ std::vector<Candlestick> WeatherSystem::filterData(const std::vector<Candlestick
     // TODO: Filter the candlesticks based on the date range
     // Keep only candles where date >= startDate and date <= endDate
     return filtered;
+}
+
+void WeatherSystem::printMenu()
+{
+    std::cout << "1. Plot Yearly Data" << std::endl;
+    std::cout << "2. Plot Monthly Data" << std::endl;
+    std::cout << "3. Filter Data" << std::endl;
+    std::cout << "4. Predict Temperature" << std::endl;
+    std::cout << "5. Exit" << std::endl;
+    std::cout << "=========================" << std::endl;
 }
