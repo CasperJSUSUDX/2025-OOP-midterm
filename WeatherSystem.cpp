@@ -5,6 +5,7 @@
 #include <cmath>
 #include <numeric>
 #include <iomanip>
+#include <sstream>
 
 void WeatherSystem::run(const std::string& filename) {
     // TODO: 1. Ask user for country code (e.g., "AT")
@@ -22,13 +23,17 @@ void WeatherSystem::run(const std::string& filename) {
     // 3. Filter Data
     // 4. Predict Temperature
     // 5. Exit
-    printMenu();
+    // printMenu();
+
+    
 
     std::vector<Candlestick> candlesticks = computeCandlesticks(data, Timeframe::Yearly);
-    for (const Candlestick& e: candlesticks)
-    {
-        std::cout << "Date: " << e.date << "\nOpen: " << e.open << "\nClose: " << e.close << "\nHigh: " << e.high << "\nLow: " << e.low << "\n" << std::endl;
-    }
+    // for (const Candlestick& e: candlesticks)
+    // {
+    //     e.print();
+    // }
+
+    plotCandlesticks(candlesticks, Timeframe::Yearly);
     
     // Based on the user's choice, call the appropriate helper functions
 }
@@ -132,19 +137,68 @@ void WeatherSystem::plotCandlesticks(const std::vector<Candlestick>& candles, Ti
     // TODO: Implement a text-based plot
     
     // 1. Determine the range of temperatures (min and max) across all candles to scale the Y-axis
-    
+    double numberOfDigits = 0.0;
+    double max = std::round(candles[0].high * std::pow(10.0, numberOfDigits)) / std::pow(10.0, numberOfDigits);
+    double min = std::round(candles[0].low * std::pow(10.0, numberOfDigits)) / std::pow(10.0, numberOfDigits);
+    for (const Candlestick& e: candles)
+    {
+        double roundHigh = std::round(e.high * std::pow(10.0, numberOfDigits)) / std::pow(10.0, numberOfDigits);
+        double roundLow = std::round(e.low * std::pow(10.0, numberOfDigits)) / std::pow(10.0, numberOfDigits);
+        if (max > roundHigh)
+        {
+            max = roundHigh;
+        }
+        if (min < roundLow)
+        {
+            min = roundLow;
+        }
+    }
+
     // 2. Create a 2D buffer (e.g., std::vector<std::string>) to represent the plot area
     //    Height could be fixed (e.g., 20 lines), Width depends on number of candles
+    std::vector<std::string> buffer;
+    // double range = (max - min) / std::pow(10.0, numberOfDigits);
+    // buffer.push_back(std::to_string(max) + " "+ std::to_string(min) + " " + std::to_string(range));
+    for (double i = 0.0; i < (max - min + 1) * std::pow(10.0, numberOfDigits); ++i)
+    {
+        double yValue = max - i * std::pow(10.0, -numberOfDigits);
+        std::stringstream ss;
+        ss << std::fixed << std::setprecision(numberOfDigits) << yValue;
+        std::string yValueStr = ss.str();
+        std::string space(3 - yValueStr.length(), ' ');
+        if (yValue == 0)
+        {
+            buffer.push_back(space + yValueStr + "+");
+        }
+        else
+        {
+            buffer.push_back(space + yValueStr + "|");
+        }
+    }
     
     // 3. Iterate through the candlesticks and draw them on the buffer
     //    - Scale the High, Low, Open, Close values to the Y-axis range
     //    - Use '|' for the wick (High to Low)
     //    - Use '#' or similar for the body (Open to Close)
+    // BUG: Memory issue
+    unsigned int row = 5;
+    for (const Candlestick& e: candles)
+    {
+        // for (int i = std::max({max, min}); i < max - min; ++i)
+        // {
+        //     buffer[e.open - max] += "#";
+        // }
+        ++row;
+    }
     
     // 4. Print the buffer to the console
     //    - Print Y-axis labels (temperature values)
     //    - Print the plot lines
     //    - Print X-axis labels (dates)
+    for (std::string& line: buffer)
+    {
+        std::cout << line << std::endl;
+    }
 }
 
 void WeatherSystem::predictTemperature(const std::vector<Candlestick>& candles) {

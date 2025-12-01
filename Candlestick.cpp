@@ -11,4 +11,5 @@ void Candlestick::print() const {
     // TODO: Print the candlestick data in a readable format
     // Example output: 1980 Open: 10.5 Close: 12.0 High: 15.0 Low: 8.0
     // Hint: Use std::cout and std::setw for formatting if needed
+    std::cout << date << "Open: " << open << " Close: " << close << " High: " << high << " Low: " << low <<std::endl;
 }
